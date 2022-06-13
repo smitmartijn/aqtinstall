@@ -227,8 +227,8 @@ class QtArchives:
 
     def _download_update_xml(self, update_xml_path):
         """Hook for unit test."""
-        xml_hash = get_hash(update_xml_path, "sha256", self.timeout)
-        return getUrl(posixpath.join(self.base, update_xml_path), self.timeout, xml_hash)
+        #xml_hash = get_hash(update_xml_path, "sha256", self.timeout)
+        return getUrl(posixpath.join(self.base, update_xml_path), self.timeout, None) #xml_hash)
 
     def _parse_update_xml(self, os_target_folder, update_xml_text, target_packages: Optional[ModuleToPackage]):
         if not target_packages:

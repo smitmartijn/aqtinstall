@@ -91,14 +91,14 @@ def getUrl(url: str, timeout, expected_hash: Optional[bytes] = None) -> str:
                 msg = f"Failed to retrieve file at {url}\nServer response code: {r.status_code}, reason: {r.reason}"
                 raise ArchiveDownloadError(msg)
         result = r.text
-        filename = url.split("/")[-1]
-        actual_hash = hashlib.sha256(bytes(result, "utf-8")).digest()
-        if expected_hash is not None and expected_hash != actual_hash:
-            raise ArchiveChecksumError(
-                f"Downloaded file {filename} is corrupted! Detect checksum error.\n"
-                f"Expect {expected_hash.hex()}: {url}\n"
-                f"Actual {actual_hash.hex()}: {filename}"
-            )
+        #filename = url.split("/")[-1]
+        #actual_hash = hashlib.sha256(bytes(result, "utf-8")).digest()
+        #if expected_hash is not None and expected_hash != actual_hash:
+        #    raise ArchiveChecksumError(
+        #        f"Downloaded file {filename} is corrupted! Detect checksum error.\n"
+        #        f"Expect {expected_hash.hex()}: {url}\n"
+        #        f"Actual {actual_hash.hex()}: {filename}"
+        #    )
     return result
 
 
@@ -199,10 +199,11 @@ def get_hash(archive_path: str, algorithm: str, timeout) -> bytes:
                 return binascii.unhexlify(_hash)
         except (ArchiveConnectionError, ArchiveDownloadError, binascii.Incomplete, binascii.Error):
             pass
-    filename = archive_path.split("/")[-1]
-    raise ChecksumDownloadFailure(
-        f"Failed to download checksum for the file '{filename}' from mirrors '{Settings.trusted_mirrors}"
-    )
+    return ""
+    #filename = archive_path.split("/")[-1]
+    #raise ChecksumDownloadFailure(
+    #    f"Failed to download checksum for the file '{filename}' from mirrors '{Settings.trusted_mirrors}"
+    #)
 
 
 def altlink(url: str, alt: str):
