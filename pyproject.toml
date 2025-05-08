@@ -33,6 +33,9 @@ dependencies = [
 ]
 dynamic = ["version", "readme"]
 
+[tool.bdist_wheel]
+universal = 1
+
 [tool.setuptools]
 packages = ["aqt"]
 

@@ -1,0 +1,59 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - 'aqt/**'
+      - 'pyproject.toml'
+      - 'setup.py'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.9'
+    addToPath: true
+  displayName: 'Use Python 3.9'
+
+- script: |
+    python -m pip install --upgrade pip
+    pip install build wheel setuptools
+  displayName: 'Install build dependencies'
+
+- script: |
+    VERSION=$(python -c "from aqt.metadata import __version__; print(__version__)")
+    echo "Package version: $VERSION"
+    echo "##vso[task.setvariable variable=PACKAGE_VERSION]$VERSION"
+  displayName: 'Extract package version'
+
+- script: |
+    python -m build --wheel
+  displayName: 'Build wheel package'
+
+- task: CopyFiles@2
+  inputs:
+    sourceFolder: 'dist'
+    contents: '*.whl'
+    targetFolder: '$(Build.ArtifactStagingDirectory)/wheel'
+  displayName: 'Copy wheel to staging directory'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)/wheel'
+    artifactName: 'wheel'
+  displayName: 'Publish wheel artifact'
+
+- task: UniversalPackages@0
+  inputs:
+    command: 'publish'
+    publishDirectory: 'dist'
+    feedsToUsePublish: 'internal'
+    vstsFeedPublish: 'aqtinstall'
+    vstsFeedPackagePublish: 'aqtinstall'
+    versionOption: 'custom'
+    versionPublish: '$(PACKAGE_VERSION)'
+    packagePublishDescription: 'aqtinstall wheel package'
+  displayName: 'Publish to Azure Artifacts feed'
